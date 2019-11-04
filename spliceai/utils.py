@@ -126,7 +126,7 @@ def get_delta_scores(record, ann, dist_var, mask):
                 continue
 
             if len(record.ref) > 1 and len(record.alts[j]) > 1:
-                delta_scores.append("{}|{}|.|.|.|.|.|.|.|.".format(record.alts[j], genes[i]))
+                delta_scores.append("{}|{}|.|.|.|.|.|.|.|.|.".format(record.alts[j], genes[i]))
                 continue
 
             dist_ann = ann.get_pos_data(idxs[i], record.pos)
@@ -177,9 +177,10 @@ def get_delta_scores(record, ann, dist_var, mask):
             mask_pd = np.logical_and((idx_pd-cov//2 == dist_ann[2]), mask)
             mask_nd = np.logical_and((idx_nd-cov//2 != dist_ann[2]), mask)
 
-            delta_scores.append("{}|{}|{:.2f}|{:.2f}|{:.2f}|{:.2f}|{}|{}|{}|{}".format(
+            delta_scores.append("{}|{}|{}|{:.2f}|{:.2f}|{:.2f}|{:.2f}|{}|{}|{}|{}".format(
                                 record.alts[j],
                                 genes[i],
+                                dist_ann[2],
                                 (y[1, idx_pa, 1]-y[0, idx_pa, 1])*(1-mask_pa),
                                 (y[0, idx_na, 1]-y[1, idx_na, 1])*(1-mask_na),
                                 (y[1, idx_pd, 2]-y[0, idx_pd, 2])*(1-mask_pd),
