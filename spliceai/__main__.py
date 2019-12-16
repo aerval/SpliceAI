@@ -58,7 +58,8 @@ def main():
     header.add_line('##INFO=<ID=SpliceAI,Number=.,Type=String,Description="SpliceAIv1.3 variant '
                     'annotation. These include delta scores (DS) and delta positions (DP) for '
                     'acceptor gain (AG), acceptor loss (AL), donor gain (DG), and donor loss (DL). '
-                    'Format: ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL">')
+                    'This version also includes the distance (DIST) to the nearest splice site.'
+                    'Format: ALLELE|SYMBOL|DIST|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL">')
 
     try:
         output = pysam.VariantFile(args.O, mode='w', header=header)
