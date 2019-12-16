@@ -34,6 +34,8 @@ def get_options():
                         type=int, choices=[0, 1],
                         help='mask scores representing annotated acceptor/donor gain and '
                              'unannotated acceptor/donor loss, defaults to 0')
+    parser.add_argument('-P', metavar='prescore', nargs='+', default=[],
+                        help='one or more tabix indexed prescored vcf.gz files')
     args = parser.parse_args()
 
     return args
@@ -67,10 +69,19 @@ def main():
         logging.error('{}'.format(e))
         exit()
 
+    # loading prescored files
+    prescored_files = []
+    try:
+        for filename in args.P:
+            vcf_file = pysam.VariantFile(filename)
+            prescored_files.append(vcf_file)
+    except (IOError, ValueError) as e:
+        logging.error('{}'.format(e))
+
     ann = Annotator(args.R, args.A)
 
     for record in vcf:
-        scores = get_delta_scores(record, ann, args.D, args.M)
+        scores = get_delta_scores(record, ann, args.D, args.M, prescored_files)
         if len(scores) > 0:
             record.info['SpliceAI'] = scores
         output.write(record)

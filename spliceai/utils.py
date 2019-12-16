@@ -92,7 +92,7 @@ def normalise_chrom(source, target):
     return source
 
 
-def get_delta_scores(record, ann, dist_var, mask):
+def get_delta_scores(record, ann, dist_var, mask, prescored_files = None):
 
     cov = 2*dist_var+1
     wid = 10000+cov
@@ -107,6 +107,33 @@ def get_delta_scores(record, ann, dist_var, mask):
     (genes, strands, idxs) = ann.get_name_and_strand(record.chrom, record.pos)
     if len(idxs) == 0:
         return delta_scores
+
+    if prescored_files:
+        all_found = True
+        for j in range(len(record.alts)):
+            found = False
+            for vcf_file in prescored_files:
+                for hit in vcf_file.fetch(record.chrom, record.pos-1, record.pos):
+                    if hit.ref == record.ref and record.alts[j] == hit.alts[0]:
+                        fields = hit.info['SpliceAI'][0].split('|')
+                        # add distance to splice site info for masking
+                        for gene, idx in zip(genes, idxs):
+                            if gene == fields[1]:
+                                dist_ann = ann.get_pos_data(idx, record.pos)
+                        delta_scores.append('{}|{}|{}'.format(
+                                            '|'.join(fields[:2]),
+                                            dist_ann[2],
+                                            '|'.join(fields[2:])))
+                        found = True
+                        break
+                if found:
+                    break
+            if not found:
+                all_found = False
+        if all_found:
+            return delta_scores
+        else: # delete already found sites if not all found to not get them twice
+            delta_scores = []
 
     chrom = normalise_chrom(record.chrom, list(ann.ref_fasta.keys())[0])
     try:
