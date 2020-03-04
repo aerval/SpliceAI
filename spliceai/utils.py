@@ -117,9 +117,12 @@ def get_delta_scores(record, ann, dist_var, mask, prescored_files = None):
                     if hit.ref == record.ref and record.alts[j] == hit.alts[0]:
                         fields = hit.info['SpliceAI'][0].split('|')
                         # add distance to splice site info for masking
+                        dist_ann = None
                         for gene, idx in zip(genes, idxs):
                             if gene == fields[1]:
                                 dist_ann = ann.get_pos_data(idx, record.pos)
+                        if not dist_ann:
+                            continue
                         delta_scores.append('{}|{}|{}'.format(
                                             '|'.join(fields[:2]),
                                             dist_ann[2],
